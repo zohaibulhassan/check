@@ -24,7 +24,7 @@ class User extends Authenticatable
     'city',
     'registration_no',
     'company_description',
-    'approval_key',
+    // 'approval_key',
     'zipcode',
     'phone',
     'email',

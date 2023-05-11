@@ -34,16 +34,9 @@
 
 <div class="page_container">
    <form action="{{ route('search') }}" method="GET">
-    <div class="row">
-    <div class="col-md-4">
-    <div class="form-group">
-        <label for="Select tag">Select Year-</label>
-        <select name="span_year" id="span_year" class="form-control select2" data-placeholder="Select the year" style="width: 100%;">
-        </select>
-    </div>
-</div>
-
- <?php $companies = \App\Models\User::all();?>
+      <div class="row">
+          
+           <?php $companies = \App\Models\User::all();?>
 <div class="col-md-4">
     <div class="form-group">
         <label for="Select category">Select Company:-</label>
@@ -54,29 +47,34 @@
                 @if ($loop->iteration <= 4 )
                     <option value="{{$comp->id}}">{{$comp->company_name}}</option>
                 @else
-                  <option class="premium-icon"  value="">&#x29E9;{{$comp->company_name}}</option>
-
-                  
+                  <option class="premium-icon"  value="">&#x29E9;{{$comp->company_name}}</option>     
                 @endif
                 @endif
             @endforeach
         </select>
     </div>
 </div>
-
-    <div class="col-md-4" style="height:50%">
+            
+            <div class="col-md-4">
+               <div class="form-group">
+                  <label for="Select tag">Select Year-</label>
+                  <select name="span_year" id="span_year" class="form-control select2" data-placeholder="Select the year" style="width: 100%;">
+                  </select>
+               </div>
+            </div>
+         <div class="col-md-4" style="height:50%">
             <div class="form-group">
                <label for="">&nbsp;</label> <!-- Empty label for spacing -->
                <button type="submit" class="btn btn-success btn-block" id="property-filter">Search</button>
             </div>
          </div>
-    </div>
-    </form>
+      </div>
+   </form>
+</div>
 
 <center>
-
-    <div style="width:35%;height:35%;">
-        <canvas id="myChart" ></canvas>
+    <div style="width: 300px; height: 300px;">
+        <canvas id="myChart"></canvas>
     </div>
 </center>
 
@@ -85,9 +83,11 @@
 
 <table id="company_share_table" class="table">
     <thead>
-        <tr>
+         <tr>
+            <th>Company Id</th>
             <th>Company</th>
-            <th>Shared Company Name</th>
+            <th>Shared Holder Id</th>
+            <th>Shared Holder Name</th>
             <th>Percentage</th>
             <th>No. of Shares</th>
             <th>Reg Number</th>
@@ -180,9 +180,11 @@ $(document).on('submit', 'form', function(event) {
                 tableBody.empty();
 
                 // Populate the table with the retrieved company share data
-                companyShareData.forEach(function(data) {
+                  companyShareData.forEach(function(data) {
                     var row = $('<tr>');
+                    row.append($('<td>').text(data.CompanyId));
                     row.append($('<td>').text(data.Company));
+                   row.append($('<td>').text(data.SharedCompanyid));
                     row.append($('<td>').text(data.SharedCompanyname));
                     row.append($('<td>').text(data.Percentage));
                     row.append($('<td>').text(data.NoShares));
