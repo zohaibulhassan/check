@@ -1,205 +1,210 @@
 @extends('layouts.app')
 @section('content')
-
-<div class="page_container">
-   <form action="{{ route('search') }}" method="GET">
-      <div class="row">
-          
-          <?php $companies = \App\Models\User::all();?>
-          <div class="col-md-4">
-              <div class="form-group">
-                  <label for="Select category">Select Company:-</label>
-                  <select name="company_id" id="company_id" class="form-control">
-                      <option value="">Select company</option>
-                      @foreach($companies as $comp)
-                      @if ($comp->user_type != "a")
-            <option value="{{$comp->id}}" @if($loop->first) selected @endif>{{$comp->company_name}}</option>
-
-                      @endif
-                      @endforeach
+    <div class="page_container">
+        <div class="row">
+            <?php $companies = \App\Models\savecompany::all(); ?>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="Select category">Select Company:-</label>
+                    <select name="company_id" id="company_id" class="form-control">
+                        {{-- <option value="">Select company</option> --}}
+                        @foreach ($companies as $comp)
+                            @if ($comp->user_type != 'a')
+                                <option value="{{ $comp->id }}"
+                                    @if ($loop->iteration == 1) selected="selected" @endif>{{ $comp->company_name }}
+                                </option>
+                            @endif
+                        @endforeach
                     </select>
                 </div>
             </div>
-            
+
             <div class="col-md-4">
-               <div class="form-group">
-                  <label for="Select tag">Select Year-</label>
-                  <select name="span_year" id="span_year" class="form-control select2" data-placeholder="Select the year" style="width: 100%;">
-                        
-  
-                </select>
-               </div>
-            </div>
-         <div class="col-md-4" style="height:50%">
-            <div class="form-group">
-               <label for="">&nbsp;</label> <!-- Empty label for spacing -->
-               <button type="submit" class="btn btn-success btn-block" id="property-filter">Search</button>
-            </div>
-         </div>
-      </div>
-   </form>
-</div>
+                <div class="form-group">
+                    <label for="Select tag">Select Year-</label>
+                    <select name="span_year" id="span_year" class="form-control select2" data-placeholder="Select the year"
+                        style="width: 100%;">
 
-<center>
-    <div style="width: 300px; height: 300px;">
-        <canvas id="myChart"></canvas>
+
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4" style="height:50%">
+                <div class="form-group">
+                    <label for="">&nbsp;</label> <!-- Empty label for spacing -->
+                    <button type="submit" class="btn btn-success btn-block" id="searchbutton">Search</button>
+                </div>
+            </div>
+        </div>
     </div>
-</center>
+
+    <center>
+        <div style="width: 300px; height: 300px;">
+            <canvas id="myChart"></canvas>
+        </div>
+    </center>
 
 
 
 
-<table id="company_share_table" class="table">
-    <thead>
-        <tr>
-            <th>Company Id</th>
-            <th>Company</th>
-            <th>Shared Holder Id</th>
-            <th>Shared Holder Name</th>
-            <th>Percentage</th>
-            <th>No. of Shares</th>
-            <th>Reg Number</th>
-            <th>Stock Year</th>
-            <th>Stock Year Span</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Table body will be dynamically populated with the search results -->
-    </tbody>
-</table>
+    <table id="company_share_table" class="table">
+        <thead>
+            <tr>
+                <th>Company Id</th>
+                <th>Company</th>
+                <th>Shared Holder Id</th>
+                <th>Shared Holder Name</th>
+                <th>Percentage</th>
+                <th>No. of Shares</th>
+                <th>Reg Number</th>
+                <th>Stock Year</th>
+                <th>Stock Year Span</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table body will be dynamically populated with the search results -->
+        </tbody>
+    </table>
 
 
 
-    
-</div>
- 
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
- <script>
+    </div>
 
-$(document).on('change', '#company_id', function() {
-    var companyId = $(this).val();
-    console.log(companyId);
-    var spanYearSelect = $('#span_year');
-    
-    // Clear existing options
-    spanYearSelect.empty();
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    // Make AJAX request to fetch stock years for the selected company
-    $.ajax({
-        url: '{{ route("getStockYears") }}',
-        type: 'GET',
-        data: {
-            'company_id': companyId
-        },
-        success: function(response) {
-            var stockYears = response.stockYears;
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            var companyId = $('#company_id').val(); // Get the initial value of the #company_id element
 
-            // Populate the years dropdown with the fetched stock years
-            stockYears.forEach(function(year) {
-                spanYearSelect.append($('<option>', {
-                    value: year,
-                    text: year
-                }));
-            });
-        },
-        error: function() {
-            // Handle error
-        }
-    });
-});
+            if (companyId) {
 
-$(document).on('submit', 'form', function(event) {
-        event.preventDefault(); // Prevent the form from submitting normally
+                var spanYearSelect = $('#span_year');
 
-        var form = $(this);
-        var url = form.attr('action');
-        var formData = form.serialize(); // Serialize the form data
+                // Clear existing options
+                spanYearSelect.empty();
 
-        // Make AJAX request to retrieve the company share data
-        $.ajax({
-            url: '{{ route("search") }}', // Use the dynamic URL from the form action
-            type: 'GET',
-            data: formData,
-            success: function(response) {
-                
-                var companyShareData = response.companyShareData;
-                var tableBody = $('#company_share_table tbody');
+                // Make AJAX request to fetch stock years for the selected company
+                $.ajax({
+                    url: '{{ route('getStockYears') }}',
+                    type: 'GET',
+                    data: {
+                        'company_id': companyId
+                    },
+                    success: function(response) {
+                        var stockYears = response.stockYears;
 
-                // Clear existing table rows
-                tableBody.empty();
-
-                // Populate the table with the retrieved company share data
-                companyShareData.forEach(function(data) {
-                    var row = $('<tr>');
-                    row.append($('<td>').text(data.CompanyId));
-                    row.append($('<td>').text(data.Company));
-                   row.append($('<td>').text(data.SharedCompanyid));
-                    row.append($('<td>').text(data.SharedCompanyname));
-                    row.append($('<td>').text(data.Percentage));
-                    row.append($('<td>').text(data.NoShares));
-                    row.append($('<td>').text(data.Regnumber));
-                    row.append($('<td>').text(data.StockYear));
-                    row.append($('<td>').text(data.StockYearSpan));
-
-                    tableBody.append(row);
+                        // Populate the years dropdown with the fetched stock years
+                        stockYears.forEach(function(year) {
+                            spanYearSelect.append($('<option>', {
+                                value: year,
+                                text: year
+                            }));
+                        });
+                    },
+                    error: function() {
+                        // Handle error
+                    }
                 });
-
-                // Update the chart with the new data
-                updateChart(companyShareData);
-            },
-            error: function() {
-                // Handle error
             }
         });
-    });
 
 
 
 
+        $(document).on('change', '#company_id', function() {
+            var companyId = $(this).val();
+            console.log(companyId);
+            var spanYearSelect = $('#span_year');
+
+            // Clear existing options
+            spanYearSelect.empty();
+
+            // Make AJAX request to fetch stock years for the selected company
+            $.ajax({
+                url: '{{ route('getStockYears') }}',
+                type: 'GET',
+                data: {
+                    'company_id': companyId
+                },
+                success: function(response) {
+                    var stockYears = response.stockYears;
+
+                    // Populate the years dropdown with the fetched stock years
+                    stockYears.forEach(function(year) {
+                        spanYearSelect.append($('<option>', {
+                            value: year,
+                            text: year
+                        }));
+                    });
+                },
+                error: function() {
+                    // Handle error
+                }
+            });
+        });
 
 
-</script>
+        //Year fecting Ends
 
 
-<script>
-    $(document).on('submit', 'form', function(event) {
-    // event.preventDefault(); // Prevent the form from submitting normally
-    
-    var form = $(this);
-    var url = form.attr('action');
-    var formData = form.serialize(); // Serialize the form data
-    
+
+        $(document).on('click', '#searchbutton', function(event) {
+    event.preventDefault(); // Prevent the form from submitting normally
+
+    // Get the selected values
+    var companyID = $('#company_id').val();
+    var spanYear = $('#span_year').val();
+
     // Make AJAX request to retrieve the company share data
     $.ajax({
-        url: '{{ route("search") }}', // Use the dynamic URL from the form action
+        url: '{{ route('search') }}', // Use the dynamic URL from the form action
         type: 'GET',
-        data: formData,
+        data: {
+            company_id: companyID,
+            span_year: spanYear
+        },
         success: function(response) {
             var companyShareData = response.companyShareData;
-            
-            // Extract the SharedCompanyName values from companyShareData
-            var labels = companyShareData.map(function(data) {
-                return data.SharedCompanyname;
+            var tableBody = $('#company_share_table tbody');
+            var labels = [];
+            var dataValues = [];
+            companyShareData.forEach(function(data) {
+                labels.push(data.SharedCompanyname);
+                dataValues.push(data.Percentage);
             });
-            
-            // Generate data values without the "%" sign
-            var dataValues = companyShareData.map(function(data) {
-                // Remove the "%" sign from the percentage value
-                var percentage = data.Percentage.replace('%', '');
-                // Convert the value to a numeric format
-                return parseFloat(percentage);
+            console.log(labels);
+            console.log(dataValues);
+
+            tableBody.empty();
+            companyShareData.forEach(function(data) {
+                var row = $('<tr>');
+                row.append($('<td>').text(data.CompanyId));
+                row.append($('<td>').text(data.Company));
+                row.append($('<td>').text(data.SharedCompanyid));
+                row.append($('<td>').text(data.SharedCompanyname));
+                row.append($('<td>').text(data.Percentage));
+                row.append($('<td>').text(data.NoShares));
+                row.append($('<td>').text(data.Regnumber));
+                row.append($('<td>').text(data.StockYear));
+                row.append($('<td>').text(data.StockYearSpan));
+
+                tableBody.append(row);
             });
-            
-            // Create the dataset object
+
+            // Destroy the existing chart
+            var existingChart = Chart.getChart('myChart');
+            if (existingChart) {
+                existingChart.destroy();
+            }
+
+            // Create and render the new chart
             var dataset = {
                 label: 'Percentage',
                 data: dataValues,
                 borderWidth: 1
             };
-            
-            // Create the chart
             var ctx = document.getElementById('myChart').getContext('2d');
             var myChart = new Chart(ctx, {
                 type: 'pie',
@@ -207,48 +212,8 @@ $(document).on('submit', 'form', function(event) {
                     labels: labels,
                     datasets: [dataset]
                 },
-               options: {
-  }
+                options: {}
             });
-  
-            $(document).on('change', '#company_id', function() {
-            var selectedValue = $(this).val();
-            localStorage.setItem('selectedCompany', selectedValue);
-        });
-
-        $(document).on('change', '#span_year', function() {
-            var selectedValue = $(this).val();
-            localStorage.setItem('selectedYear', selectedValue);
-        });
-
-        // Reload the page
-        function reloadPage() {
-            // Retrieve the selected values from local storage
-            var selectedCompany = localStorage.getItem('selectedCompany');
-            var selectedYear = localStorage.getItem('selectedYear');
-
-            // Set the selected values back in the dropdowns
-            if (selectedCompany) {
-                $('#company_id').val(selectedCompany);
-            }
-
-            if (selectedYear) {
-                $('#span_year').val(selectedYear);
-            }
-
-            // Reload the page
-            location.reload();
-        }
-
-        // Call the reloadPage function when the form is submitted
-        $(document).on('submit', 'form', function(event) {
-            event.preventDefault();
-            reloadPage();
-        });
-
-        // Call the reloadPage function when the page loads
-      
-            
         },
         error: function() {
             // Handle error
@@ -256,9 +221,5 @@ $(document).on('submit', 'form', function(event) {
     });
 });
 
-
-
-</script>
-
-
+    </script>
 @endsection

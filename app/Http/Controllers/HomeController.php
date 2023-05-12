@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\savecompany;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -56,13 +57,17 @@ class HomeController extends Controller
 
     public function getStockYears(Request $request)
     {
-        $company_id = $request->input('company_id');
-        $stockYears = company_share_data::where('CompanyId', $company_id)->distinct()->pluck('StockYear')->toArray();
-        
-        return response()->json(['stockYears' => $stockYears]);
+        $companyId = $request->input('company_id');
 
-        
+        $stockYears = company_share_data::where('CompanyId', $companyId)
+            ->pluck('StockYear')
+            ->unique()
+            ->sort()
+            ->values();
+
+        return response()->json(['stockYears' => $stockYears]);
     }
+
     public function uploaddata()
     {
         # code...
@@ -95,13 +100,17 @@ class HomeController extends Controller
             $shareData->Company = $row[1];
             $shareData->SharedCompanyid = $row[2];
             $shareData->SharedCompanyname = $row[3];
-            $shareData->Percentage = $row[4];
-            $shareData->NoShares = $row[5];
-            $shareData->SharedHolderType = $row[6];
+            $shareData->SharedHolderType = $row[4];
+            $shareData->Percentage = $row[5];
+            $shareData->NoShares = $row[6];
             $shareData->Regnumber = $row[7];
             $shareData->StockYear = $row[8];
-            $shareData->StockYearSpan = $row[9];
 
+            $stockYear = $row[8];
+            $nextYear = $stockYear + 1;
+            $stockYearSpan = $stockYear . '-' . $nextYear;
+
+            $shareData->StockYearSpan = $stockYearSpan;
             // Save the instance to the database
             $shareData->save();
         }
@@ -130,34 +139,31 @@ class HomeController extends Controller
         return redirect(url('/users'));
     }
 
-
     public function download(Request $request)
     {
         $company_id = $request->input('id');
         $companies = $request->input('companies_id');
+        $companies = array_values(array_diff($companies, ['all'])); // Remove 'all' and re-index array keys
         $years = $request->input('years');
 
+        $company_name = savecompany::where('id', $company_id)->pluck('company_name');
+        $sharedCompanyname = savecompany::whereIn('id', $companies)->pluck('company_name')->toArray();
 
-        $company_name = User::where('id', $company_id)->pluck('company_name');
-        $sharedCompanyname = User::whereIn('id', $companies)->pluck('company_name')->toArray();
-        $regno = User::whereIn('id', $companies)->pluck('registration_no')->toArray();
-       
-       
         $data = [
             'companyId' => $company_id,
             'companyname' => $company_name,
             'sharedcompanyid' => $companies,
             'sharedCompanyname' => $sharedCompanyname,
             'years' => $years,
-            'regno' => $regno
         ];
 
         $export = new CompanyDataExport($data);
         $fileName = 'company_data.xlsx';
 
+        return Excel::download($export, $fileName);
 
-        return  Excel::download($export, $fileName);
-         
+
+
 
     }
 
@@ -170,7 +176,6 @@ class HomeController extends Controller
         $companyShareData = company_share_data::where('CompanyId', $companyId)
             ->where('StockYear', $stockYear)
             ->get();
-
         return response()->json(['companyShareData' => $companyShareData]);
     }
 
@@ -211,17 +216,43 @@ class HomeController extends Controller
 
     public function mapping()
     {
-        $users = User::where('user_status', 'a')->get();
-        return view('mapping', compact('users'));
+        $companies  = savecompany::all();
+        return view('mapping', compact('companies'));
     }
+
+    public function editcompany($id)
+    {
+        # code...
+        $editcompanies = savecompany::find($id);
+        return view('editcompany', compact('editcompanies'));
+    }
+  
+    public function updatecompany(Request $request)
+    {
+        # code...
+        $obj = savecompany::find($request->id);
+        $obj->company_name = $request->company_name;
+        $obj->company_description = $request->company_description;
+        $obj->save();
+        return redirect(url('mapping'));
+    }
+
+    public function savecompany(Request $request)
+    {
+        # code...
+        $obj = new savecompany();
+        $obj->company_name = $request->company_name;
+        $obj->company_description = $request->company_description;
+        $obj->save();
+        return redirect(url('mapping'));
+
+    }
+    
     public function map_company($companyid)
     {
         # code...
 
-        $companies = User::where('user_status', 'a')
-        ->where('user_type','u')
-        ->whereNotIn('id', [$companyid])
-        ->get();
+        $companies = savecompany::where('id', '!=', $companyid)->get();
         return view('map_company',compact('companies'));
     }
 

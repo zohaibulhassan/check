@@ -25,7 +25,7 @@ class CompanyDataExport implements FromCollection, WithHeadings
         $sharedCompanyid = $this->data['sharedcompanyid'];
         $sharedCompanyname = $this->data['sharedCompanyname'];
         $years = $this->data['years'];
-        $regno = $this->data['regno'];
+        // $regno = $this->data['regno'];
 
         $rows = [];
 
@@ -38,7 +38,6 @@ class CompanyDataExport implements FromCollection, WithHeadings
                 null,
                 null,
                 null,
-                $regno[$index],
                 null,
                 $years,
             ];
@@ -55,14 +54,13 @@ class CompanyDataExport implements FromCollection, WithHeadings
         return [
             'Company Id',
             'Company',
-            "Shared Company Id",
-            'Shared Company name',
+            "Shared Holder Id",
+            'Shared Holder name',
+            'sharedholdertype',
             'Percentage',
             'NoShares',
-            'sharedholdertype',
             'Regnumber',
             "StockYear",
-            'StockYearSpan',
         ];
     }
 }

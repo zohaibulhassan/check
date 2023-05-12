@@ -35,10 +35,10 @@ Route::post('/fetchdata', [App\Http\Controllers\HomeController::class, 'fetchdat
 Route::get('/uploaddata',[App\Http\Controllers\HomeController::class, 'uploaddata'])->name('uploaddata');
 Route::post('/uploadDatafile',[App\Http\Controllers\HomeController::class, 'uploadDatafile'])->name('uploadDatafile');
 Route::post('registermodal', [App\Http\Controllers\HomeController::class, 'registermodal'])->name('registermodal');
-
+Route::post('savecompany', [App\Http\Controllers\HomeController::class, 'savecompany'])->name('savecompany');
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'search'])->name('search');
-
-
+Route::get('editcompany/{id}', [App\Http\Controllers\HomeController::class, 'editcompany'])->name('editcompany');
+Route::post('updatecompany', [App\Http\Controllers\HomeController::class, 'updatecompany'])->name('updatecompany');
 
 Route::post('/approve_user/{user}', [App\Http\Controllers\HomeController::class, 'approve'])->name('approve_user');
 Route::delete('/reject_user/{user}', [App\Http\Controllers\HomeController::class, 'reject'])->name('reject_user');

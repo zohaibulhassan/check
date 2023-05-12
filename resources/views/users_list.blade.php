@@ -14,8 +14,9 @@
     <thead>
         <tr>
             <th>Sno</th>
-            <th>Company Name</th>
-            <th>Registration No</th>
+            <th>Name</th>
+            <th>Email</th>
+            {{-- <th>Registration No</th> --}}
             <th>Actions</th>
         </tr>
     </thead>
@@ -26,7 +27,7 @@
                 
                 <td>{{ $loop->iteration }}</td>
                 <td>(ME) {{ $user->company_name }}</td>
-                <td>{{ $user->registration_no }}</td>
+                {{-- <td>{{ $user->registration_no }}</td> --}}
                 <td>
                 @if($user->user_status == 'p')
                     <form action="{{ route('approve_user', $user->id) }}" method="POST" style="display: inline-block;">
@@ -50,7 +51,8 @@
         <tr>
             <td>{{ $loop->iteration }}</td>
             <td>{{ $user->company_name }}</td>
-            <td>{{ $user->registration_no }}</td>
+            <td>{{$user->email}}</td>
+            {{-- <td>{{ $user->registration_no }}</td> --}}
             <td>
                 @if($user->user_status == 'p')
                     <form action="{{ route('approve_user', $user->id) }}" method="POST" style="display: inline-block;">
