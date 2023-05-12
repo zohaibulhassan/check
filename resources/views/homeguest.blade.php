@@ -8,37 +8,15 @@
                     <label for="Select category">Select Company:-</label>
                     <select name="company_id" id="company_id" class="form-control">
                         {{-- <option value="">Select company</option> --}}
-                        @foreach ($companies as $comp)
-                            @php
-                                $premium = '';
-                                if (true) {
-                                    if ($loop->iteration > 3) {
-                                        $premium = ' (Premium)';
-                                    }
-                                    $firstYear = $comp->stock_years->first();
-                                    $otherYears = $comp->stock_years->slice(1);
-                            @endphp
-                                <option value="{{ $comp->id }}" 
-                                    @if ($firstYear == $spanYear) selected="selected" @endif>
-                                    {{ $comp->company_name }}
-                                    @if ($firstYear == $spanYear) 
-                                        @if ($premium) 
-                                            <span class="premium-label">{{ $premium }}</span>
-                                        @endif
-                                    @endif
+                       
+                            @foreach ($companies as $comp)
+                                <option value="{{ $loop->iteration == 1 ? $comp->id : '' }}"
+                                    @if ($loop->iteration == 1) selected="selected" @endif
+                                    @if ($loop->iteration > 3) class="text-warning" @endif> {{ $comp->company_name }}
                                 </option>
-                            @php
-                                    foreach ($otherYears as $year) {
-                                        echo '<option value="" disabled>';
-                                        echo $year;
-                                        if ($premium) {
-                                            echo ' (Premium)';
-                                        }
-                                        echo '</option>';
-                                    }
-                                }
-                            @endphp
-                        @endforeach
+                            @endforeach
+                     
+
                     </select>
                 </div>
             </div>
@@ -48,29 +26,8 @@
                     <label for="Select tag">Select Year-</label>
                     <select name="span_year" id="span_year" class="form-control select2" data-placeholder="Select the year"
                         style="width: 100%;">
-                        {{-- Populate the stock years dropdown with the fetched stock years --}}
-                        @foreach ($companies as $comp)
-                            @if ($comp->user_type != 'a')
-                                @php
-                                    $firstYear = $comp->stock_years->first();
-                                    $otherYears = $comp->stock_years->slice(1);
-                                @endphp
-                                <option value="{{ $firstYear }}" 
-                                    @if ($firstYear == $spanYear) selected="selected" @endif>
-                                    {{ $firstYear }}
-                                    @if ($firstYear == $spanYear) 
-                                        @if (count($otherYears) > 0)
-                                            <span class="premium-label"> (Premium)</span>
-                                        @endif
-                                    @endif
-                                </option>
-                                @foreach ($otherYears as $year)
-                                    <option value="{{ $year }}" disabled>
-                                        {{ $year }} (Premium)
-                                    </option>
-                                @endforeach
-                            @endif
-                        @endforeach
+
+
                     </select>
                 </div>
             </div>
@@ -89,7 +46,10 @@
         </div>
     </center>
 
-       <table id="company_share_table" class="table">
+
+
+
+    <table id="company_share_table" class="table">
         <thead>
             <tr>
                 <th>Company Id</th>
@@ -107,6 +67,9 @@
             <!-- Table body will be dynamically populated with the search results -->
         </tbody>
     </table>
+
+
+
 
     </div>
 
@@ -149,8 +112,12 @@
             }
         });
 
+
+
+
         $(document).on('change', '#company_id', function() {
             var companyId = $(this).val();
+            console.log(companyId);
             var spanYearSelect = $('#span_year');
 
             // Clear existing options
@@ -179,6 +146,10 @@
                 }
             });
         });
+
+
+        //Year fecting Ends
+
 
         $(document).on('click', '#searchbutton', function(event) {
             event.preventDefault(); // Prevent the form from submitting normally
@@ -251,5 +222,71 @@
             });
         });
     </script>
-@endsection
 
+    <script>
+        setTimeout(() => {
+            var companyID = $('#company_id').val();
+            var spanYear = $('#span_year').val();
+
+            // Make AJAX request to retrieve the company share data
+            $.ajax({
+                url: '{{ route('search') }}', // Use the dynamic URL from the form action
+                type: 'GET',
+                data: {
+                    company_id: companyID,
+                    span_year: spanYear
+                },
+                success: function(response) {
+                    var companyShareData = response.companyShareData;
+                    var tableBody = $('#company_share_table tbody');
+                    var labels = [];
+                    var dataValues = [];
+                    companyShareData.forEach(function(data) {
+                        labels.push(data.SharedCompanyname);
+                        dataValues.push(data.Percentage);
+                    });
+                    console.log(labels);
+                    console.log(dataValues);
+
+                    tableBody.empty();
+                    companyShareData.forEach(function(data) {
+                        var row = $('<tr>');
+                        row.append($('<td>').text(data.CompanyId));
+                        row.append($('<td>').text(data.Company));
+                        row.append($('<td>').text(data.SharedCompanyid));
+                        row.append($('<td>').text(data.SharedCompanyname));
+                        row.append($('<td>').text(data.Percentage));
+                        row.append($('<td>').text(data.NoShares));
+                        row.append($('<td>').text(data.Regnumber));
+                        row.append($('<td>').text(data.StockYear));
+                        row.append($('<td>').text(data.StockYearSpan));
+
+                        tableBody.append(row);
+                    });
+
+                    // Destroy the existing chart
+
+
+                    // Create and render the new chart
+                    var dataset = {
+                        label: 'Percentage',
+                        data: dataValues,
+                        borderWidth: 1
+                    };
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [dataset]
+                        },
+                        options: {}
+                    });
+                },
+                error: function() {
+                    // Handle error
+                }
+            });
+        }, 1500);
+    </script>
+@endsection

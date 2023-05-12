@@ -149,8 +149,7 @@
         //Year fecting Ends
 
 
-
-        $(document).on('click', '#searchbutton', function(event) {
+    $(document).on('click', '#searchbutton', function(event) {
     event.preventDefault(); // Prevent the form from submitting normally
 
     // Get the selected values
@@ -221,5 +220,76 @@
     });
 });
 
+
+
+
+
+    </script>
+
+    <script>
+        setTimeout(() => {
+             var companyID = $('#company_id').val();
+    var spanYear = $('#span_year').val();
+
+    // Make AJAX request to retrieve the company share data
+    $.ajax({
+        url: '{{ route('search') }}', // Use the dynamic URL from the form action
+        type: 'GET',
+        data: {
+            company_id: companyID,
+            span_year: spanYear
+        },
+        success: function(response) {
+            var companyShareData = response.companyShareData;
+            var tableBody = $('#company_share_table tbody');
+            var labels = [];
+            var dataValues = [];
+            companyShareData.forEach(function(data) {
+                labels.push(data.SharedCompanyname);
+                dataValues.push(data.Percentage);
+            });
+            console.log(labels);
+            console.log(dataValues);
+
+            tableBody.empty();
+            companyShareData.forEach(function(data) {
+                var row = $('<tr>');
+                row.append($('<td>').text(data.CompanyId));
+                row.append($('<td>').text(data.Company));
+                row.append($('<td>').text(data.SharedCompanyid));
+                row.append($('<td>').text(data.SharedCompanyname));
+                row.append($('<td>').text(data.Percentage));
+                row.append($('<td>').text(data.NoShares));
+                row.append($('<td>').text(data.Regnumber));
+                row.append($('<td>').text(data.StockYear));
+                row.append($('<td>').text(data.StockYearSpan));
+
+                tableBody.append(row);
+            });
+
+            // Destroy the existing chart
+          
+
+            // Create and render the new chart
+            var dataset = {
+                label: 'Percentage',
+                data: dataValues,
+                borderWidth: 1
+            };
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [dataset]
+                },
+                options: {}
+            });
+        },
+        error: function() {
+            // Handle error
+        }
+    });
+        }, 1500);
     </script>
 @endsection
