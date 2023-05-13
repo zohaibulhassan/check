@@ -27,7 +27,9 @@
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/animate.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/font-awesome/css/font-awesome.min.css') }}">
- 
+ <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
     <link rel="stylesheet" href="{{ asset('assets/admin/plugins/bs-stepper/css/bs-stepper.min.css') }}">
     <!-- Parsley css -->
     <link rel="stylesheet" href="{{ asset('assets/admin/plugins/parsley/parsley.css')}}">
@@ -95,7 +97,10 @@
 	
     <div class="header_wrapper">
         <nav class="navbar navbar-expand-lg navbar-light tanahpro_navbar">
-            <a class="navbar-brand" href="#"><img src="{{asset('assets/images/logo.jpg')}}" class="logo"
+            <?php
+$logo = \App\Models\UpdateLogo::latest()->value('logo');
+?>
+            <a class="navbar-brand" href="#"><img src="{{asset('assets/images/'.$logo)}}" class="logo"
                     alt="Logo"></a>
                     <button style="margin-right: 15px;" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
                     aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,11 +121,14 @@
 
                  @endif
                      @endauth
+                      @auth
+                    @if(auth::user()->user_type == 'a')
                     <li class="nav-item submit_property">
                         <a class="nav-link"
-                            href="">Stock view</a>
+                            href="{{url('demomapping')}}">Demo Stock View</a>
                     </li>
-                    
+                    @endif
+                     @endauth
                     @auth
                     @if(auth::user()->user_type == 'a')
                     <li class="nav-item submit_property">
@@ -151,6 +159,15 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                  
+                                  @auth
+                    @if(auth::user()->user_type == 'a')
+                                    <a class="dropdown-item" href="{{ route('updatelogo') }}" >
+                                        Update Logo
+                                    </a>
+                                 @endif
+                                 @endauth 
+                                  
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

@@ -2,17 +2,26 @@
 @section('content')
     <div class="page_container">
         <div class="row">
-            <?php $companies = \App\Models\savecompany::all(); ?>
+            <?php $companies = \App\Models\savecompany::all(); 
+            $companies2 = \App\Models\demosavecompanies::all(); 
+            ?>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="Select category">Select Company:-</label>
-                    <select name="company_id" id="company_id" class="form-control">
+                    <select name="company_id" id="company_id" class="form-control" style="width: 100%;">
                         {{-- <option value="">Select company</option> --}}
                        
-                            @foreach ($companies as $comp)
-                                <option value="{{ $loop->iteration == 1 ? $comp->id : '' }}"
-                                    @if ($loop->iteration == 1) selected="selected" @endif
-                                    @if ($loop->iteration > 3) class="text-warning" @endif> {{ $comp->company_name }}
+                           
+
+                             @foreach ($companies2 as $comp)
+                                
+                                 <option value="{{$comp->id}}"
+                                    @if ($loop->iteration == 1) selected="selected" @endif> {{ $comp->company_name }}
+                                </option>
+                            @endforeach
+
+                             @foreach ($companies as $comp)
+                               <option value="" class="text-warning" id="premium" > {{ $comp->company_name }}
                                 </option>
                             @endforeach
                      
@@ -24,10 +33,8 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="Select tag">Select Year-</label>
-                    <select name="span_year" id="span_year" class="form-control select2" data-placeholder="Select the year"
+                    <select name="span_year" id="span_year" class=" form-select" data-placeholder="Select the year"
                         style="width: 100%;">
-
-
                     </select>
                 </div>
             </div>
@@ -67,6 +74,23 @@
             <!-- Table body will be dynamically populated with the search results -->
         </tbody>
     </table>
+<div class="modal fade"  tabindex="-1" role="dialog">
+  <div class="modal-dialog"  role="document">
+    <div class="modal-content bg-dots-darker" class=""> 
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="modalCloseBtn" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        <p> <img src="https://img.uxwing.com/wp-content/themes/uxwing/download/sport-awards/premium-icon.svg" width="70px" alt=""> Premium Feature Register to see more data</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close" id="modalCloseBtn">Close</button>
+        <a  class="btn btn-primary" href="{{url('register')}}" >Register</a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 
@@ -89,21 +113,25 @@
 
                 // Make AJAX request to fetch stock years for the selected company
                 $.ajax({
-                    url: '{{ route('getStockYears') }}',
+                    url: '{{ route('demogetStockYears') }}',
                     type: 'GET',
                     data: {
                         'company_id': companyId
                     },
+                  
                     success: function(response) {
+                        console.log(response);
                         var stockYears = response.stockYears;
-
+                          
                         // Populate the years dropdown with the fetched stock years
                         stockYears.forEach(function(year) {
-                            spanYearSelect.append($('<option>', {
+                            spanYearSelect.append($('<option >', {
                                 value: year,
                                 text: year
                             }));
-                        });
+                        }
+                        
+                        );
                     },
                     error: function() {
                         // Handle error
@@ -117,22 +145,22 @@
 
         $(document).on('change', '#company_id', function() {
             var companyId = $(this).val();
-            console.log(companyId);
+           console.log(companyId);
             var spanYearSelect = $('#span_year');
-
+            
             // Clear existing options
             spanYearSelect.empty();
 
             // Make AJAX request to fetch stock years for the selected company
             $.ajax({
-                url: '{{ route('getStockYears') }}',
+                url: '{{ route('demogetStockYears') }}',
                 type: 'GET',
                 data: {
                     'company_id': companyId
                 },
                 success: function(response) {
                     var stockYears = response.stockYears;
-
+                    console.log(stockYears);
                     // Populate the years dropdown with the fetched stock years
                     stockYears.forEach(function(year) {
                         spanYearSelect.append($('<option>', {
@@ -160,7 +188,7 @@
 
             // Make AJAX request to retrieve the company share data
             $.ajax({
-                url: '{{ route('search') }}', // Use the dynamic URL from the form action
+                url: '{{ route('demosearch') }}', // Use the dynamic URL from the form action
                 type: 'GET',
                 data: {
                     company_id: companyID,
@@ -230,7 +258,7 @@
 
             // Make AJAX request to retrieve the company share data
             $.ajax({
-                url: '{{ route('search') }}', // Use the dynamic URL from the form action
+                url: '{{ route('demosearch') }}', // Use the dynamic URL from the form action
                 type: 'GET',
                 data: {
                     company_id: companyID,
@@ -288,5 +316,25 @@
                 }
             });
         }, 1500);
+    </script>
+    <script>
+        $('#company_id').change(function() {
+      // Get the selected option's ID
+  var selectedOptionId = $(this).children('option:selected').attr('id');
+
+  if (selectedOptionId === 'premium') {
+    console.log("hello");
+
+    // Get the selected option's value
+    var title = $(this).val();
+    $('.modal-title').html(title);
+    $('.modal').modal('show');
+    
+     $('.modal').click(function(e) {
+                    // Hide the modal
+                    $('.modal').modal('hide');
+                });
+  }
+});
     </script>
 @endsection

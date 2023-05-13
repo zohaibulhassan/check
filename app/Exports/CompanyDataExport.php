@@ -31,7 +31,7 @@ class CompanyDataExport implements FromCollection, WithHeadings
 
         foreach ($sharedCompanyname as $index => $sharedCompany) {
             $rows[] = [
-                $companyid[0],
+                $companyid,
                 $companyname[0],
                 $sharedCompanyid[$index],
                 $sharedCompany,

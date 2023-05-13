@@ -22,7 +22,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="Select tag">Select Year-</label>
-                    <select name="span_year" id="span_year" class="form-control select2" data-placeholder="Select the year"
+                    <select name="span_year" id="span_year" class="form-select " data-placeholder="Select the year"
                         style="width: 100%;">
 
 
@@ -67,6 +67,8 @@
     </table>
 
 
+    
+
 
 
     </div>
@@ -74,6 +76,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         $(document).ready(function() {
             var companyId = $('#company_id').val(); // Get the initial value of the #company_id element
@@ -292,4 +295,5 @@
     });
         }, 1500);
     </script>
+
 @endsection
