@@ -28,7 +28,7 @@
                                 @endforeach
                             </select>
                         </div>
-                    </div>  
+                    </div>
                 </div>
 
                 <div class="col-md-6">
@@ -39,7 +39,9 @@
                             @php
                                 $currentYear = date('Y');
                                 for ($i = $currentYear; $i >= $currentYear - 49; $i--) {
-                                    $yearRange = $i;
+                                    $startYear = $i;
+                                    $endYear = $i + 1;
+                                    $yearRange = $startYear . '-' . $endYear;
                                     echo '<option value="' . $yearRange . '">' . $yearRange . '</option>';
                                 }
                             @endphp

@@ -144,17 +144,17 @@ class HomeController extends Controller
             $shareData = new company_share_data();
 
             // Assign values to the instance properties
-            $shareData->CompanyId = $row[0];
-            $shareData->Company = $row[1];
-            $shareData->SharedCompanyid = $row[2];
-            $shareData->SharedCompanyname = $row[3];
-            $shareData->SharedHolderType = $row[4];
-            $shareData->Percentage = $row[5];
-            $shareData->NoShares = $row[6];
-            $shareData->Regnumber = $row[7];
-            $shareData->StockYear = $row[8];
+            $shareData->CompanyId = preg_replace('/[^a-zA-Z0-9]/', '', $row[0]);
+            $shareData->Company = preg_replace('/[^a-zA-Z0-9]/', '', $row[1]);
+            $shareData->SharedCompanyid = preg_replace('/[^a-zA-Z0-9]/', '', $row[2]);
+            $shareData->SharedCompanyname = preg_replace('/[^a-zA-Z0-9]/', '', $row[3]);
+            $shareData->SharedHolderType = preg_replace('/[^a-zA-Z0-9]/', '', $row[4]);
+            $shareData->Percentage = preg_replace('/[^0-9.]/', '', $row[5]);
+            $shareData->NoShares = preg_replace('/[^0-9]/', '', $row[6]);
+            $shareData->Regnumber = preg_replace('/[^a-zA-Z0-9]/', '', $row[7]);
+            $shareData->StockYear = preg_replace('/[^0-9]/', '', $row[8]);
 
-            $stockYear = $row[8];
+            $stockYear = $shareData->StockYear;
             $nextYear = $stockYear + 1;
             $stockYearSpan = $stockYear . '-' . $nextYear;
 
@@ -165,6 +165,7 @@ class HomeController extends Controller
 
         return redirect()->route('home');
     }
+
 
 
     public function demouploadDatafile(Request $request)
@@ -185,21 +186,21 @@ class HomeController extends Controller
 
         // Process each row of data
         foreach ($data as $row) {
-            // Create a new CompanyShareData instance
+            // Create a new dummy_data instance
             $shareData = new dummy_data();
 
             // Assign values to the instance properties
-            $shareData->CompanyId = $row[0];
-            $shareData->Company = $row[1];
-            $shareData->SharedCompanyid = $row[2];
-            $shareData->SharedCompanyname = $row[3];
-            $shareData->SharedHolderType = $row[4];
-            $shareData->Percentage = $row[5];
-            $shareData->NoShares = $row[6];
-            $shareData->Regnumber = $row[7];
-            $shareData->StockYear = $row[8];
+            $shareData->CompanyId = preg_replace('/[^a-zA-Z0-9]/', '', $row[0]);
+            $shareData->Company = preg_replace('/[^a-zA-Z0-9]/', '', $row[1]);
+            $shareData->SharedCompanyid = preg_replace('/[^a-zA-Z0-9]/', '', $row[2]);
+            $shareData->SharedCompanyname = preg_replace('/[^a-zA-Z0-9]/', '', $row[3]);
+            $shareData->SharedHolderType = preg_replace('/[^a-zA-Z0-9]/', '', $row[4]);
+            $shareData->Percentage = preg_replace('/[^0-9.]/', '', $row[5]);
+            $shareData->NoShares = preg_replace('/[^0-9]/', '', $row[6]);
+            $shareData->Regnumber = preg_replace('/[^a-zA-Z0-9]/', '', $row[7]);
+            $shareData->StockYear = preg_replace('/[^0-9]/', '', $row[8]);
 
-            $stockYear = $row[8];
+            $stockYear = $shareData->StockYear;
             $nextYear = $stockYear + 1;
             $stockYearSpan = $stockYear . '-' . $nextYear;
 
@@ -210,6 +211,7 @@ class HomeController extends Controller
 
         return redirect()->route('home');
     }
+
 
 
     public function registermodal(request $request)
