@@ -38,6 +38,11 @@
         </div>
     </div>
 
+    <div class="container" id="companydesc_table">
+        <h1 id="companyhead"></h1>
+        <p id="companydesc"></p>
+    </div>
+
     <center>
         <div style="width: 300px; height: 300px;">
             <canvas id="myChart"></canvas>
@@ -46,39 +51,41 @@
 
 
 
+    <div class="container">
 
-    <table id="company_share_table" class="table">
-        <thead>
-            <tr>
-                <th>Company Id</th>
-                <th>Company</th>
-                <th>Shared Holder Id</th>
-                <th>Shared Holder Name</th>
-                <th>Percentage</th>
-                <th>No. of Shares</th>
-                <th>Reg Number</th>
-                <th>Stock Year</th>
-                <th>Stock Year Span</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Table body will be dynamically populated with the search results -->
-        </tbody>
-    </table>
-
-
-    
-
-
-
+        <table id="company_share_table" class="table">
+            <thead>
+                <tr>
+                    <th>Company Id</th>
+                    <th>Company</th>
+                    <th>Shared Holder Id</th>
+                    <th>Shared Holder Name</th>
+                    <th>Percentage</th>
+                    <th>No. of Shares</th>
+                    <th>Reg Number</th>
+                    <th>Stock Year</th>
+                    {{-- <th>Stock Year Span</th> --}}
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table body will be dynamically populated with the search results -->
+            </tbody>
+        </table>
+        <div class="float-right">
+            <button id="excel-download-button" class="btn btn-success">Excel Download</button>
+        </div>
     </div>
+    </div>
+
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script>
         $(document).ready(function() {
+
             var companyId = $('#company_id').val(); // Get the initial value of the #company_id element
 
             if (companyId) {
@@ -152,148 +159,183 @@
         //Year fecting Ends
 
 
-    $(document).on('click', '#searchbutton', function(event) {
-    event.preventDefault(); // Prevent the form from submitting normally
+        $(document).on('click', '#searchbutton', function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
 
-    // Get the selected values
-    var companyID = $('#company_id').val();
-    var spanYear = $('#span_year').val();
+            // Get the selected values
+            var companyID = $('#company_id').val();
+            var spanYear = $('#span_year').val();
 
-    // Make AJAX request to retrieve the company share data
-    $.ajax({
-        url: '{{ route('search') }}', // Use the dynamic URL from the form action
-        type: 'GET',
-        data: {
-            company_id: companyID,
-            span_year: spanYear
-        },
-        success: function(response) {
-            var companyShareData = response.companyShareData;
-            var tableBody = $('#company_share_table tbody');
-            var labels = [];
-            var dataValues = [];
-            companyShareData.forEach(function(data) {
-                labels.push(data.SharedCompanyname);
-                dataValues.push(data.Percentage);
-            });
-            console.log(labels);
-            console.log(dataValues);
-
-            tableBody.empty();
-            companyShareData.forEach(function(data) {
-                var row = $('<tr>');
-                row.append($('<td>').text(data.CompanyId));
-                row.append($('<td>').text(data.Company));
-                row.append($('<td>').text(data.SharedCompanyid));
-                row.append($('<td>').text(data.SharedCompanyname));
-                row.append($('<td>').text(data.Percentage));
-                row.append($('<td>').text(data.NoShares));
-                row.append($('<td>').text(data.Regnumber));
-                row.append($('<td>').text(data.StockYear));
-                row.append($('<td>').text(data.StockYearSpan));
-
-                tableBody.append(row);
-            });
-
-            // Destroy the existing chart
-            var existingChart = Chart.getChart('myChart');
-            if (existingChart) {
-                existingChart.destroy();
-            }
-
-            // Create and render the new chart
-            var dataset = {
-                label: 'Percentage',
-                data: dataValues,
-                borderWidth: 1
-            };
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: 'pie',
+            // Make AJAX request to retrieve the company share data
+            $.ajax({
+                url: '{{ route('search') }}', // Use the dynamic URL from the form action
+                type: 'GET',
                 data: {
-                    labels: labels,
-                    datasets: [dataset]
+                    company_id: companyID,
+                    span_year: spanYear
                 },
-                options: {}
+                success: function(response) {
+                    var companyShareData = response.companyShareData;
+                    var tableBody = $('#company_share_table tbody');
+                    var labels = [];
+                    var dataValues = [];
+                    companyShareData.forEach(function(data) {
+                        labels.push(data.SharedCompanyname);
+                        dataValues.push(data.Percentage);
+                    });
+                    console.log(labels);
+                    console.log(dataValues);
+
+                    tableBody.empty();
+                    companyShareData.forEach(function(data) {
+                        var row = $('<tr>');
+                        row.append($('<td>').text(data.CompanyId));
+                        row.append($('<td>').text(data.Company));
+                        row.append($('<td>').text(data.SharedCompanyid));
+                        row.append($('<td>').text(data.SharedCompanyname));
+                        row.append($('<td>').text(data.Percentage));
+                        row.append($('<td>').text(data.NoShares));
+                        row.append($('<td>').text(data.Regnumber));
+                        // row.append($('<td>').text(data.StockYear));
+                        row.append($('<td>').text(data.StockYearSpan));
+
+                        tableBody.append(row);
+                    });
+
+                    $('#companyhead').text(response.companyname);
+                    $('#companydesc').text(response.companydesc);
+
+                    // Destroy the existing chart
+                    var existingChart = Chart.getChart('myChart');
+                    if (existingChart) {
+                        existingChart.destroy();
+                    }
+
+                    // Create and render the new chart
+                    var dataset = {
+                        label: 'Percentage',
+                        data: dataValues,
+                        borderWidth: 1
+                    };
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [dataset]
+                        },
+                        options: {}
+                    });
+                },
+                error: function() {
+                    // Handle error
+                }
             });
-        },
-        error: function() {
-            // Handle error
-        }
-    });
-});
-
-
-
-
-
+        });
     </script>
 
     <script>
         setTimeout(() => {
-             var companyID = $('#company_id').val();
-    var spanYear = $('#span_year').val();
+            var companyID = $('#company_id').val();
+            var spanYear = $('#span_year').val();
 
-    // Make AJAX request to retrieve the company share data
-    $.ajax({
-        url: '{{ route('search') }}', // Use the dynamic URL from the form action
-        type: 'GET',
-        data: {
-            company_id: companyID,
-            span_year: spanYear
-        },
-        success: function(response) {
-            var companyShareData = response.companyShareData;
-            var tableBody = $('#company_share_table tbody');
-            var labels = [];
-            var dataValues = [];
-            companyShareData.forEach(function(data) {
-                labels.push(data.SharedCompanyname);
-                dataValues.push(data.Percentage);
-            });
-            console.log(labels);
-            console.log(dataValues);
-
-            tableBody.empty();
-            companyShareData.forEach(function(data) {
-                var row = $('<tr>');
-                row.append($('<td>').text(data.CompanyId));
-                row.append($('<td>').text(data.Company));
-                row.append($('<td>').text(data.SharedCompanyid));
-                row.append($('<td>').text(data.SharedCompanyname));
-                row.append($('<td>').text(data.Percentage));
-                row.append($('<td>').text(data.NoShares));
-                row.append($('<td>').text(data.Regnumber));
-                row.append($('<td>').text(data.StockYear));
-                row.append($('<td>').text(data.StockYearSpan));
-
-                tableBody.append(row);
-            });
-
-            // Destroy the existing chart
-          
-
-            // Create and render the new chart
-            var dataset = {
-                label: 'Percentage',
-                data: dataValues,
-                borderWidth: 1
-            };
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: 'pie',
+            // Make AJAX request to retrieve the company share data
+            $.ajax({
+                url: '{{ route('search') }}', // Use the dynamic URL from the form action
+                type: 'GET',
                 data: {
-                    labels: labels,
-                    datasets: [dataset]
+                    company_id: companyID,
+                    span_year: spanYear
                 },
-                options: {}
-            });
-        },
-        error: function() {
-            // Handle error
-        }
-    });
-        }, 1500);
-    </script>
+                success: function(response) {
+                    var companyShareData = response.companyShareData;
+                    var tableBody = $('#company_share_table tbody');
+                    var labels = [];
+                    var dataValues = [];
+                    companyShareData.forEach(function(data) {
+                        labels.push(data.SharedCompanyname);
+                        dataValues.push(data.Percentage);
+                    });
 
+                    $('#companyhead').text(response.companyname);
+                    $('#companydesc').text(response.companydesc);
+
+
+                    tableBody.empty();
+                    companyShareData.forEach(function(data) {
+                        var row = $('<tr>');
+                        row.append($('<td>').text(data.CompanyId));
+                        row.append($('<td>').text(data.Company));
+                        row.append($('<td>').text(data.SharedCompanyid));
+                        row.append($('<td>').text(data.SharedCompanyname));
+                        row.append($('<td>').text(data.Percentage));
+                        row.append($('<td>').text(data.NoShares));
+                        row.append($('<td>').text(data.Regnumber));
+                        row.append($('<td>').text(data.StockYear));
+                        row.append($('<td>').text(data.StockYearSpan));
+
+                        tableBody.append(row);
+                    });
+
+
+                    // Destroy the existing chart
+
+
+                    // Create and render the new chart
+                    var dataset = {
+                        label: 'Percentage',
+                        data: dataValues,
+                        borderWidth: 1
+                    };
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [dataset]
+                        },
+                        options: {}
+                    });
+                },
+                error: function() {
+                    // Handle error
+                }
+            });
+        }, 1500);
+
+
+        function exportTableToExcel() {
+            var table = document.getElementById("company_share_table");
+            var wb = XLSX.utils.table_to_book(table, {
+                sheet: "Sheet JS"
+            });
+            var wbout = XLSX.write(wb, {
+                bookType: "xlsx",
+                type: "array"
+            });
+            saveAsExcelFile(wbout, "company_share_table.xlsx");
+        }
+
+        function saveAsExcelFile(data, filename) {
+            var blob = new Blob([data], {
+                type: "application/octet-stream"
+            });
+            var url = URL.createObjectURL(blob);
+
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+
+            setTimeout(function() {
+                URL.revokeObjectURL(url);
+                a.remove();
+            }, 100);
+        }
+
+        // Attach click event handler to the download button
+        $("#excel-download-button").click(function() {
+            exportTableToExcel();
+        });
+    </script>
 @endsection

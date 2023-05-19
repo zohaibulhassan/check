@@ -15,6 +15,7 @@
         <tr>
             <th>Sno</th>
             <th>Name</th>
+            <th>Last Name</th>
             <th>Email</th>
             <th>Address</th>
             {{-- <th>Registration No</th> --}}
@@ -28,6 +29,7 @@
                 
                 <td>{{ $loop->iteration }}</td>
                 <td>(ME) {{ $user->company_name }}</td>
+                <td>(ME) {{ $user->last_name }}</td>
                 {{-- <td>{{ $user->registration_no }}</td> --}}
                 <td>{{$user->address}}</td>
                 <td>
@@ -53,6 +55,7 @@
         <tr>
             <td>{{ $loop->iteration }}</td>
             <td>{{ $user->company_name }}</td>
+            <td>{{ $user->last_name }}</td>
             <td>{{$user->email}}</td>
              <td>{{$user->address}}</td>
             {{-- <td>{{ $user->registration_no }}</td> --}}

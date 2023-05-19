@@ -35,8 +35,6 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/plugins/parsley/parsley.css')}}">
     
 
-    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 
 
     

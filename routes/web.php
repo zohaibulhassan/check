@@ -80,6 +80,12 @@ Route::get('/demohome', [App\Http\Controllers\HomeController::class, 'demosearch
 
 Route::get('editcompany/{id}', [App\Http\Controllers\HomeController::class, 'editcompany'])->name('editcompany');
 Route::post('updatecompany', [App\Http\Controllers\HomeController::class, 'updatecompany'])->name('updatecompany');
+
+Route::get('demoeditcompany/{id}', [App\Http\Controllers\HomeController::class, 'demoeditcompany'])->name('demoeditcompany');
+Route::post('demoupdatecompany', [App\Http\Controllers\HomeController::class, 'demoupdatecompany'])->name('demoupdatecompany');
+
+
+
 Route::get('updatelogo', [App\Http\Controllers\HomeController::class, 'updatelogo'])->name('updatelogo');
 Route::post('savelogo', [App\Http\Controllers\HomeController::class, 'savelogo'])->name('savelogo');
 Route::post('/approve_user/{user}', [App\Http\Controllers\HomeController::class, 'approve'])->name('approve_user');

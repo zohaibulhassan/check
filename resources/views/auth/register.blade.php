@@ -12,12 +12,26 @@
                         @csrf
 
                         <div class="row mb-3">
-                            <label for="company_name" class="col-md-4 col-form-label text-md-end">{{ __('Company Name') }}</label>
+                            <label for="company_name" class="col-md-4 col-form-label text-md-end">{{ __(' Name') }}</label>
 
                             <div class="col-md-6">
                                 <input id="company_name" type="text" class="form-control @error('company_name') is-invalid @enderror" name="company_name" value="{{ old('company_name') }}" required autocomplete="company_name" autofocus>
 
                                 @error('company_name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="last_name" class="col-md-4 col-form-label text-md-end">{{ __('Last Name') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="last_name" type="text" class="form-control @error('last_name') is-invalid @enderror" name="last_name" value="{{ old('last_name') }}" required autocomplete="last_name" autofocus>
+
+                                @error('last_name')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

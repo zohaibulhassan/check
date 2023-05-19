@@ -10,9 +10,6 @@
                     <label for="Select category">Select Company:-</label>
                     <select name="company_id" id="company_id" class="form-control" style="width: 100%;">
                         {{-- <option value="">Select company</option> --}}
-                       
-                           
-
                              @foreach ($companies2 as $comp)
                                 
                                  <option value="{{$comp->id}}"
@@ -24,8 +21,6 @@
                                <option value="" class="text-warning" id="premium" > {{ $comp->company_name }}
                                 </option>
                             @endforeach
-                     
-
                     </select>
                 </div>
             </div>
@@ -47,6 +42,12 @@
         </div>
     </div>
 
+    <div class="container" id="companydesc_table">
+        <h1 id="companyhead"></h1>
+        <p id="companydesc"></p>
+    </div>
+
+
     <center>
         <div style="width: 300px; height: 300px;">
             <canvas id="myChart"></canvas>
@@ -55,7 +56,7 @@
 
 
 
-
+<div class="container">
     <table id="company_share_table" class="table">
         <thead>
             <tr>
@@ -67,13 +68,17 @@
                 <th>No. of Shares</th>
                 <th>Reg Number</th>
                 <th>Stock Year</th>
-                <th>Stock Year Span</th>
+                {{-- <th>Stock Year Span</th> --}}
             </tr>
         </thead>
         <tbody>
             <!-- Table body will be dynamically populated with the search results -->
         </tbody>
     </table>
+    <div class="float-right">
+        <button id="excel-download-button" class="btn btn-success">Excel Download</button>
+    </div>
+</div>
 <div class="modal fade"  tabindex="-1" role="dialog">
   <div class="modal-dialog"  role="document">
     <div class="modal-content bg-dots-darker" class=""> 
@@ -98,8 +103,8 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script>
         $(document).ready(function() {
             var companyId = $('#company_id').val(); // Get the initial value of the #company_id element
@@ -216,11 +221,15 @@
                         row.append($('<td>').text(data.Percentage));
                         row.append($('<td>').text(data.NoShares));
                         row.append($('<td>').text(data.Regnumber));
-                        row.append($('<td>').text(data.StockYear));
+                        // row.append($('<td>').text(data.StockYear));
                         row.append($('<td>').text(data.StockYearSpan));
 
                         tableBody.append(row);
                     });
+
+                      $('#companyhead').text(response.companyname);
+                    $('#companydesc').text(response.companydesc);
+
 
                     // Destroy the existing chart
                     var existingChart = Chart.getChart('myChart');
@@ -276,6 +285,10 @@
                     console.log(labels);
                     console.log(dataValues);
 
+                        $('#companyhead').text(response.companyname);
+                    $('#companydesc').text(response.companydesc);
+
+
                     tableBody.empty();
                     companyShareData.forEach(function(data) {
                         var row = $('<tr>');
@@ -316,6 +329,40 @@
                 }
             });
         }, 1500);
+
+         function exportTableToExcel() {
+            var table = document.getElementById("company_share_table");
+            var wb = XLSX.utils.table_to_book(table, {
+                sheet: "Sheet JS"
+            });
+            var wbout = XLSX.write(wb, {
+                bookType: "xlsx",
+                type: "array"
+            });
+            saveAsExcelFile(wbout, "company_share_table.xlsx");
+        }
+
+        function saveAsExcelFile(data, filename) {
+            var blob = new Blob([data], {
+                type: "application/octet-stream"
+            });
+            var url = URL.createObjectURL(blob);
+
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+
+            setTimeout(function() {
+                URL.revokeObjectURL(url);
+                a.remove();
+            }, 100);
+        }
+
+        // Attach click event handler to the download button
+       
+
+
     </script>
     <script>
         $('#company_id').change(function() {
@@ -336,5 +383,13 @@
                 });
   }
 });
+
+
+
+
+ $("#excel-download-button").click(function() {
+            console.log("hello");
+            exportTableToExcel();
+        });
     </script>
 @endsection

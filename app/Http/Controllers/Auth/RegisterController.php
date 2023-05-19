@@ -53,6 +53,7 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'company_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['nullable', 'string', 'max:255'],
             'country' => ['nullable', 'string', 'max:255'],
             'state' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:255'],
@@ -75,6 +76,7 @@ class RegisterController extends Controller
     {
         return User::create([
             'company_name' => $data['company_name'],
+            'last_name' => $data['last_name'],
             'country' => $data['country'],
             'state' => $data['state'],
             'city' => $data['city'],
@@ -88,8 +90,6 @@ class RegisterController extends Controller
             'user_status' => 'p',
             'user_type' => 'u',
             'address' => $data['address']
-
-
         ]);
     }
 }

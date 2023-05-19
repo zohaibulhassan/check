@@ -290,7 +290,9 @@ class HomeController extends Controller
         $companyShareData = company_share_data::where('CompanyId', $companyId)
             ->where('StockYear', $stockYear)
             ->get();
-        return response()->json(['companyShareData' => $companyShareData]);
+        $companyname = savecompany::where('id', $companyId)->pluck('company_name');
+        $companydesc = savecompany::where('id', $companyId)->pluck('company_description');
+        return response()->json(['companyShareData' => $companyShareData, 'companyname' => $companyname, 'companydesc' => $companydesc]);
     }
 
 
@@ -302,7 +304,11 @@ class HomeController extends Controller
         $companyShareData = dummy_data::where('CompanyId', $companyId)
             ->where('StockYear', $stockYear)
             ->get();
-        return response()->json(['companyShareData' => $companyShareData]);
+
+        $companyname = demosavecompanies::where('id', $companyId)->pluck('company_name');
+        $companydesc = demosavecompanies::where('id', $companyId)->pluck('company_description');
+
+        return response()->json(['companyShareData' => $companyShareData, 'companyname' => $companyname, 'companydesc' => $companydesc]);
     }
 
 
@@ -382,6 +388,24 @@ class HomeController extends Controller
         $obj->company_description = $request->company_description;
         $obj->save();
         return redirect(url('mapping'));
+    }
+
+
+    public function demoeditcompany($id)
+    {
+        # code...
+        $editcompanies = demosavecompanies::find($id);
+        return view('demoeditcompany', compact('editcompanies'));
+    }
+
+    public function demoupdatecompany(Request $request)
+    {
+        # code...
+        $obj = demosavecompanies::find($request->id);
+        $obj->company_name = $request->company_name;
+        $obj->company_description = $request->company_description;
+        $obj->save();
+        return redirect(url('demomapping'));
     }
     
 

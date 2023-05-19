@@ -34,7 +34,7 @@
                             <td>{{ $company->company_description }}</td>
                             <td><a href="{{ url('demomap_company', $company->id) }}" class="btn btn-success">Map Company</a>
                             <a id="editCompanyBtn" class="btn btn-warning"
-                                    href="{{ url('editcompany', $company->id) }}">Edit</a>
+                                    href="{{ url('demoeditcompany', $company->id) }}">Edit</a>
                             </td>
                         </tr>
                     @endforeach
